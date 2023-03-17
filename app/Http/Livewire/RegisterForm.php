@@ -2,11 +2,11 @@
 
 namespace App\Http\Livewire;
 
-use Livewire\Component;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
+use Livewire\Component;
 
 class RegisterForm extends Component implements Forms\Contracts\HasForms
 {
@@ -80,10 +80,11 @@ class RegisterForm extends Component implements Forms\Contracts\HasForms
 
                     Checkbox::make('terms')
                         ->label('I agree with the terms and conditions.')
-                        ->columnSpanFull()
-                ])
+                        ->columnSpanFull(),
+                ]),
         ];
     }
+
     public function submit(): void
     {
         sleep(1);
