@@ -1,10 +1,26 @@
 <div>
+
+    <x-filament-support::modal id="registerFormSuccess" :darkMode="true">
+        <x-slot name="header">
+            <span class="dark:text-white">Formulário recebido com sucesso!</span>
+        </x-slot>
+
+        @if ($data)
+            <p class="dark:text-white">Olá {{ $data['first_name'] }},</p>
+        @endif
+
+        <p class="dark:text-white">Obrigado por se registrar em nosso site!</p>
+
+        <x-filament-support::button @click="$dispatch('close-modal', { id: 'registerFormSuccess' })" size="sm"
+            type="button" class="my-4">Ok
+        </x-filament-support::button>
+
+    </x-filament-support::modal>
+
     <form wire:submit.prevent="submit">
 
         {{ $this->form }}
 
-        <x-filament-support::button type="submit" wire:target='submit' class="my-4">Submit
-        </x-filament-support::button>
     </form>
 
     <p class="mt-5 dark:text-white">These input field components is part of a larger, open-source library of Tailwind CSS
@@ -13,11 +29,5 @@
             href="https://flowbite.com/docs/getting-started/introduction/" target="_blank">Flowbite
             Documentation</a>.
     </p>
-
-    @if ($data)
-        <div>
-            {{ var_export($data) }}
-        </div>
-    @endif
 
 </div>

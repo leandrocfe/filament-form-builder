@@ -26,7 +26,7 @@
 
 <body x-data="{ mode: 'dark' }" :class="mode === 'dark' ? 'dark bg-gray-800' : 'light bg-white'">
     <div class="max-w-2xl p-16 mx-auto bg-white dark:bg-gray-800">
-        <div class="flex items-end justify-end">
+        <div class="flex items-end justify-end mb-6">
             <x-dynamic-component @click="mode = 'light'" x-show="mode === 'dark'" component="heroicon-s-sun"
                 class="text-white cursor-pointer w-7">
             </x-dynamic-component>

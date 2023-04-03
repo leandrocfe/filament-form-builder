@@ -3,9 +3,18 @@
 namespace App\Http\Livewire;
 
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextInput\Mask;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\HtmlString;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class RegisterForm extends Component implements Forms\Contracts\HasForms
@@ -32,56 +41,122 @@ class RegisterForm extends Component implements Forms\Contracts\HasForms
             'password' => 'password',
             'password_confirmation' => 'password',
             'terms' => true,
+            'postal_code' => '01001-000',
+            'number' => 11
         ]);
     }
 
     protected function getFormSchema(): array
     {
         return [
+            Wizard::make([
+                Step::make('account')
+                    ->schema([
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->columnSpanFull(),
 
-            Grid::make(2)
-                ->schema([
+                        TextInput::make('first_name')
+                            ->rule('min:3')
+                            ->required()
+                            ->validationAttribute('Nome'),
 
-                    TextInput::make('email')
-                        ->email()
-                        ->required()
-                        ->columnSpanFull(),
+                        TextInput::make('last_name')
+                            ->required(),
 
-                    TextInput::make('first_name')
-                        ->rule('min:3')
-                        ->required()
-                        ->validationAttribute('Nome'),
+                        TextInput::make('company')
+                            ->required(),
 
-                    TextInput::make('last_name')
-                        ->required(),
+                        TextInput::make('phone_number')
+                            ->required(),
 
-                    TextInput::make('company')
-                        ->required(),
+                        TextInput::make('website')
+                            ->url()
+                            ->required(),
 
-                    TextInput::make('phone_number')
-                        ->required(),
+                        TextInput::make('unique_visitors')
+                            ->numeric()
+                            ->required(),
 
-                    TextInput::make('website')
-                        ->url()
-                        ->required(),
+                        TextInput::make('password')
+                            ->password()
+                            ->required()
+                            ->confirmed(),
 
-                    TextInput::make('unique_visitors')
-                        ->numeric()
-                        ->required(),
+                        TextInput::make('password_confirmation')
+                            ->password()
+                            ->required(),
 
-                    TextInput::make('password')
-                        ->password()
-                        ->required()
-                        ->confirmed(),
+                        Checkbox::make('terms')
+                            ->label('I agree with the terms and conditions.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Step::make('address')
+                    ->schema([
+                        TextInput::make('postal_code')
+                            ->required()
+                            ->mask(fn (Mask $mask) => $mask->pattern('00000-000'))
+                            ->minLength(8)
+                            ->suffixAction(function ($state, $livewire, $set) {
+                                return Action::make('search-action')
+                                    ->icon('heroicon-o-search')
+                                    ->action(function () use ($state, $livewire, $set) {
 
-                    TextInput::make('password_confirmation')
-                        ->password()
-                        ->required(),
+                                        $livewire->validateOnly('postal_code');
 
-                    Checkbox::make('terms')
-                        ->label('I agree with the terms and conditions.')
-                        ->columnSpanFull(),
-                ]),
+                                        $request = Http::get("viacep.com.br/ws/{$state}/json/")->json();
+
+                                        if (!isset($request['erro'])) {
+
+                                            $set('street', $request['logradouro']);
+                                            $set('complement', $request['complemento']);
+                                            $set('district', $request['bairro']);
+                                            $set('city', $request['localidade']);
+                                            $set('state', $request['uf']);
+                                        } else {
+
+                                            $set('street', null);
+                                            $set('complement', null);
+                                            $set('district', null);
+                                            $set('city', null);
+                                            $set('state', null);
+
+                                            throw ValidationException::withMessages([
+                                                'postal_code' => 'Este cep é inválido.'
+                                            ]);
+                                        }
+                                    });
+                            })
+                            ->columnSpan(2),
+                        TextInput::make('street')
+                            ->required()
+                            ->columnSpan(4),
+                        TextInput::make('number')
+                            ->required()
+                            ->columnSpan(2),
+                        TextInput::make('complement')
+                            ->required()
+                            ->columnSpan(4),
+                        TextInput::make('district')
+                            ->required()
+                            ->columnSpan(3),
+                        TextInput::make('city')
+                            ->required()
+                            ->columnSpan(3),
+                        Select::make('state')
+                            ->required()
+                            ->searchable()
+                            ->options(File::json(public_path('data/state.json')))
+                            ->columnSpanFull()
+                    ])
+                    ->columns(6),
+            ])
+                ->startOnStep(2)
+                ->submitAction(new HtmlString(view('livewire.register-form-submit')))
+                ->extraAttributes(['class' => 'dark:text-white'])
+                ->extraAlpineAttributes(['@form-submitted.window' => 'step = \'account\''])
         ];
     }
 
@@ -89,5 +164,10 @@ class RegisterForm extends Component implements Forms\Contracts\HasForms
     {
         sleep(1);
         $this->data = $this->form->getState();
+        $this->dispatchBrowserEvent('open-modal', ['id' => 'registerFormSuccess']);
+
+        $this->form->fill();
+
+        $this->dispatchBrowserEvent('form-submitted');
     }
 }
