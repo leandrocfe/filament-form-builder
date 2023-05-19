@@ -1,3 +1,19 @@
+# filament-form-builder
+
+Repositório utilizado na live no canal do Tio Jobs:
+
+## Live 1
+
+[Desvendando o Form Builder com Leandro Ferreira | Live](https://www.youtube.com/watch?v=qwojScrW_FU)
+
+[![Desvendando o Form Builder com Leandro Ferreira | Live](https://raw.githubusercontent.com/leandrocfe/filament-form-builder/main/screenshots/live1.png)](https://www.youtube.com/watch?v=qwojScrW_FU)
+
+## Live 2
+
+[Avançando no Form Builder com Leandro Ferreira | Live](https://www.youtube.com/watch?v=z5StCXCT7mQ)
+
+[![Desvendando o Form Builder com Leandro Ferreira | Live](https://raw.githubusercontent.com/leandrocfe/filament-form-builder/main/screenshots/live2.png)](https://www.youtube.com/watch?v=z5StCXCT7mQ)
+
 ## Installation
 
 ```bash
@@ -39,4 +55,9 @@ Please make sure to update tests as appropriate.
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-I hope you enjoy it :)
+## Get in touch
+
+-   Email: [leandrocfe@gmail.com](mailto:leandrocfe@gmail.com)
+-   Site: [leandroferreira.dev.br](https://leandroferreira.dev.br)
+
+I hope you enjoy it 😀!
